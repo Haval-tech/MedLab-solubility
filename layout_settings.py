@@ -3,6 +3,5 @@
 import streamlit as st
 
 def apply_layout():
-    # Set the sidebar to an expanded view for better user experience
+    # Only include other layout settings here, like sidebar settings
     st.sidebar.markdown("# Options")
-    st.set_page_config(layout="wide")
