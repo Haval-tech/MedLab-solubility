@@ -8,24 +8,27 @@ def calculate_degree_of_ionization(pKa, pH):
     degree_of_ionization = 100 * (ratio / (1 + ratio))
     return degree_of_ionization
 
-def dissolution_profile(pKa, concentration, environment_data, dissolution_rate):
-    """Calculate the solubility profile over time for different environments."""
+def dissolution_profile(pKa, concentration, environment_data):
+    """
+    Calculate the solubility profile over time for different environments using 
+    a first-order dissolution model with environment-specific max solubility limits.
+    """
     solubility_profile = {}
     time_steps = np.linspace(0, 120, 120)  # Time in minutes (up to 2 hours)
     
     for env in environment_data:
         pH = env['pH']
         env_name = env['name']
+        max_solubility = env['max_solubility']  # pH-specific solubility cap
+        
         ionization = calculate_degree_of_ionization(pKa, pH)
-        
-        # Assuming azithromycin dissolves faster in acidic environments
-        adjusted_rate = dissolution_rate * (3 if pH < 4 else 1)
-        
         env_solubility = []
+        
         for t in time_steps:
-            dissolved_amount = adjusted_rate * ionization * t
-            env_solubility.append(min(dissolved_amount, concentration))  # Cap at max concentration
-
+            # First-order dissolution model: rate depends on time and ionization degree
+            dissolved_amount = min(max_solubility, ionization * (1 - np.exp(-0.05 * t)))
+            env_solubility.append(dissolved_amount)
+        
         solubility_profile[env_name] = env_solubility
 
     return time_steps, solubility_profile
