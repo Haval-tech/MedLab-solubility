@@ -9,18 +9,17 @@ st.title("Azithromycin 500mg Solubility Simulation")
 # Input parameters
 pKa = 8.1
 concentration = st.slider("Tablet Concentration (mg)", 100, 1000, 500)
-dissolution_rate = st.slider("Dissolution Rate Constant", 0.01, 0.2, 0.1)
 
-# Accurate environment data for GI regions
+# Updated environment data with pH and max solubility limits
 environment_data = [
-    {'name': 'stomach', 'pH': 2.0},
-    {'name': 'duodenum', 'pH': 5.0},
-    {'name': 'jejunum', 'pH': 6.5},
-    {'name': 'ileum', 'pH': 7.5}
+    {'name': 'stomach', 'pH': 2.0, 'max_solubility': 450},
+    {'name': 'duodenum', 'pH': 5.0, 'max_solubility': 200},
+    {'name': 'jejunum', 'pH': 6.5, 'max_solubility': 150},
+    {'name': 'ileum', 'pH': 7.5, 'max_solubility': 100}
 ]
 
 # Run simulation
-time_steps, solubility_profile = dissolution_profile(pKa, concentration, environment_data, dissolution_rate)
+time_steps, solubility_profile = dissolution_profile(pKa, concentration, environment_data)
 optimal_env, max_solubility = find_optimal_solubility(solubility_profile)
 
 # Display results
