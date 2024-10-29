@@ -1,4 +1,5 @@
 # solubility_simulation.py
+
 import numpy as np
 
 def calculate_degree_of_ionization(pKa, pH):
@@ -16,12 +17,15 @@ def dissolution_profile(pKa, concentration, environment_data, dissolution_rate):
         pH = env['pH']
         env_name = env['name']
         ionization = calculate_degree_of_ionization(pKa, pH)
-        env_solubility = []
-
-        for t in time_steps:
-            dissolved_amount = dissolution_rate * ionization * t
-            env_solubility.append(min(dissolved_amount, concentration))
         
+        # Assuming azithromycin dissolves faster in acidic environments
+        adjusted_rate = dissolution_rate * (3 if pH < 4 else 1)
+        
+        env_solubility = []
+        for t in time_steps:
+            dissolved_amount = adjusted_rate * ionization * t
+            env_solubility.append(min(dissolved_amount, concentration))  # Cap at max concentration
+
         solubility_profile[env_name] = env_solubility
 
     return time_steps, solubility_profile
