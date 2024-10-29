@@ -1,6 +1,11 @@
 # streamlit_app.py
 
 import streamlit as st
+
+# Set the page layout as the very first Streamlit command
+st.set_page_config(layout="wide")
+
+# Import custom modules for settings and functionality
 from theme_settings import apply_theme
 from plot_settings import apply_plot_settings
 from layout_settings import apply_layout
@@ -8,9 +13,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from solubility_simulation import calculate_degree_of_ionization, dissolution_profile, find_optimal_solubility
 
-# Apply custom settings
+# Apply theme, layout, and plot settings
 apply_theme()        # Apply theme settings (background, font colors)
-apply_layout()       # Apply layout settings (sidebar, font size)
+apply_layout()       # Apply layout settings (sidebar, font size) but without set_page_config
 apply_plot_settings() # Apply plot settings (plot colors, style)
 
 # App title and description
