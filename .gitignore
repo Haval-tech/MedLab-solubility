@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment
+venv/
+
+# Environment variables file
+.env
+
+# macOS files
+.DS_Store
+
+# Windows files
+Thumbs.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore logs, temp files, and database
+*.log
+*.sqlite3
+
+# VSCode settings
+.vscode/
+
+# Ignore any package files like Pipfile or Poetry.lock
+Pipfile.lock
+poetry.lock
