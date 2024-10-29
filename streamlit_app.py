@@ -1,25 +1,12 @@
+# streamlit_app.py
+
 import streamlit as st
-
-# Set page configuration at the very start (before any imports or other Streamlit calls)
-st.set_page_config(layout="wide")
-
-# Import custom modules
-from theme_settings import apply_theme
-from plot_settings import apply_plot_settings
-from layout_settings import apply_layout
-import numpy as np
 import matplotlib.pyplot as plt
 from solubility_simulation import calculate_degree_of_ionization, dissolution_profile, find_optimal_solubility
 
-# Apply custom settings
-apply_theme()        # Apply theme settings (background, font colors)
-apply_layout()       # Apply other layout settings (sidebar, font size)
-apply_plot_settings() # Apply plot settings (plot colors, style)
-
-# App title and description
 st.title("Azithromycin 500mg Solubility Simulation")
 
-# Input sliders and data
+# Input parameters
 pKa = 8.1
 concentration = st.slider("Tablet Concentration (mg)", 100, 1000, 500)
 dissolution_rate = st.slider("Dissolution Rate Constant", 0.01, 0.2, 0.1)
