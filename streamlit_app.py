@@ -11,7 +11,7 @@ pKa = 8.1
 concentration = st.slider("Tablet Concentration (mg)", 100, 1000, 500)
 dissolution_rate = st.slider("Dissolution Rate Constant", 0.01, 0.2, 0.1)
 
-# Environment data for various body regions
+# Accurate environment data for GI regions
 environment_data = [
     {'name': 'stomach', 'pH': 2.0},
     {'name': 'duodenum', 'pH': 5.0},
@@ -29,9 +29,10 @@ st.write(f"Max Solubility: {max_solubility:.2f} mg")
 
 # Plotting
 fig, ax = plt.subplots()
-for env, solubility in solubility_profile.items():
-    ax.plot(time_steps, solubility, label=f"{env} (pH {environment_data[0]['pH']})")
+for i, (env, solubility) in enumerate(solubility_profile.items()):
+    env_pH = environment_data[i]['pH']
+    ax.plot(time_steps, solubility, label=f"{env} (pH {env_pH})")
 ax.set_xlabel("Time (minutes)")
 ax.set_ylabel("Dissolved Amount (mg)")
-ax.legend()
+ax.legend(title="GI Regions and pH")
 st.pyplot(fig)
