@@ -56,20 +56,27 @@ else:
     st.pyplot(fig1)
 
     # AI-Predicted Solubility Profile
-    st.subheader("AI-Predicted Solubility Profile")
-    fig2, ax2 = plt.subplots()
-    for env in selected_environments:
-        env_name = env['name']
-        predicted_solubility = []
+st.subheader("AI-Predicted Solubility Profile")
+fig2, ax2 = plt.subplots()
+for env in selected_environments:
+    env_name = env['name']
+    predicted_solubility = []
 
-        # Generate predictions over time
-        for t in time_steps:
-            features = np.array([[pKa, env['pH'], dissolution_rate, t]])
+    # Generate predictions over time
+    for t in time_steps:
+        # Ensure that features array has the correct number of elements
+        features = np.array([[pKa, env['pH'], dissolution_rate, t]])
+        
+        # Predict only if features have the right shape
+        if features.shape[1] == 4:  # Check that we have exactly 4 features
             predicted_value = model.predict(features)[0]
             predicted_solubility.append(predicted_value)
+        else:
+            st.error("Prediction failed: Feature mismatch. Ensure model and input match.")
 
-        ax2.plot(time_steps, predicted_solubility, label=f"{env_name} (Predicted, pH {env['pH']})")
-    ax2.set_xlabel("Time (minutes)")
-    ax2.set_ylabel("Dissolved Amount (mg)")
-    ax2.legend(title="Predicted GI Regions and Solubility")
-    st.pyplot(fig2)
+    ax2.plot(time_steps, predicted_solubility, label=f"{env_name} (Predicted, pH {env['pH']})")
+
+ax2.set_xlabel("Time (minutes)")
+ax2.set_ylabel("Dissolved Amount (mg)")
+ax2.legend(title="Predicted GI Regions and Solubility")
+st.pyplot(fig2)
