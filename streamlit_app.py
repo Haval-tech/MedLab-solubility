@@ -1,26 +1,68 @@
 import streamlit as st
+import requests
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Define the function to calculate ionization
-def calculate_ionization(pKa, pH):
-    ratio = 10 ** (pH - pKa)
-    ionized = ratio / (1 + ratio) * 100
-    non_ionized = 100 - ionized
-    return ionized, non_ionized
+# Function to fetch drug data from PubChem API
+def get_drug_data(drug_name):
+    # Search PubChem by drug name
+    search_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{drug_name}/property/IUPACName,pKa/JSON"
+    response = requests.get(search_url)
+    if response.status_code == 200:
+        data = response.json()
+        # Extract pKa if available
+        if 'PropertyTable' in data:
+            properties = data['PropertyTable']['Properties'][0]
+            return properties.get('pKa', None)  # Returns the pKa value if available
+    return None
 
-# Streamlit UI
+# Streamlit app UI
 st.title("Drug Solubility Simulation Tool")
 
-# User input for pKa
-pKa = st.number_input("Enter the pKa value of the substance:", min_value=0.0, max_value=14.0, step=0.01)
+# Option to select input mode: API or Manual
+input_mode = st.radio("Choose input mode:", ["API Search", "Manual Input"])
 
-# Set pH range
-pH_range = np.linspace(1, 10, 100)  # default pH range from 1 to 10
+# Option 1: API Search
+if input_mode == "API Search":
+    drug_name = st.text_input("Enter drug name to search for pKa:")
 
-# Only proceed if pKa is entered
+    if drug_name:
+        pKa = get_drug_data(drug_name)
+        if pKa:
+            st.write(f"Found pKa for {drug_name}: {pKa}")
+        else:
+            st.write("pKa information not available for this drug. Switch to manual input for custom values.")
+else:
+    # Option 2: Manual Input
+    pKa = st.number_input("Enter known pKa value:", min_value=0.0, max_value=14.0, step=0.1)
+
+# Common inputs for both modes
 if pKa:
-    # Calculate ionization over the pH range
+    # Select environment
+    environment = st.selectbox("Choose environment:", ["Stomach (pH 1-3)", "Intestine (pH 5-8)", "Custom"])
+    
+    # Set pH range based on environment
+    if environment == "Stomach (pH 1-3)":
+        pH_range = np.linspace(1, 3, 100)
+    elif environment == "Intestine (pH 5-8)":
+        pH_range = np.linspace(5, 8, 100)
+    else:
+        # Custom pH range input
+        pH_min = st.number_input("Enter minimum pH:", min_value=0.0, max_value=14.0, value=1.0, step=0.1)
+        pH_max = st.number_input("Enter maximum pH:", min_value=0.0, max_value=14.0, value=10.0, step=0.1)
+        pH_range = np.linspace(pH_min, pH_max, 100)
+
+    # Concentration input
+    concentration = st.number_input("Enter drug concentration (molarity):", min_value=0.0, step=0.01)
+
+    # Solubility calculation function
+    def calculate_ionization(pKa, pH):
+        ratio = 10 ** (pH - pKa)
+        ionized = ratio / (1 + ratio) * 100
+        non_ionized = 100 - ionized
+        return ionized, non_ionized
+
+    # Perform calculations and plot
     ionized_percentages = []
     non_ionized_percentages = []
 
