@@ -1,7 +1,13 @@
+# streamlit_app.py
+
+# Imports
 import streamlit as st
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
+import os
+from sklearn.linear_model import LinearRegression
 import joblib
+from solubility_simulation import calculate_degree_of_ionization, dissolution_profile, find_optimal_solubility
 
 # Sidebar for Inputs
 st.sidebar.title("Acid-Base Simulation Controls")
@@ -9,52 +15,52 @@ st.sidebar.subheader("Drug Properties")
 pKa = st.sidebar.slider("pKa", min_value=0.0, max_value=14.0, value=8.1)
 concentration = st.sidebar.slider("Concentration (mg)", 100, 1000, 500)
 dissolution_rate = st.sidebar.slider("Dissolution Rate", 0.01, 0.2, 0.1)
-pH = st.sidebar.slider("Environmental pH", min_value=1.0, max_value=8.0, value=5.0)
 
+# Environment pH Controls
 st.sidebar.subheader("Select Environment")
-stomach = st.sidebar.checkbox("Stomach")
-duodenum = st.sidebar.checkbox("Duodenum")
-jejunum = st.sidebar.checkbox("Jejunum")
-ileum = st.sidebar.checkbox("Ileum")
+selected_environments = []
+if st.sidebar.checkbox("Stomach"):
+    selected_environments.append({'name': 'Stomach', 'pH': st.sidebar.slider("Stomach pH", 1.0, 3.0, 2.0)})
+if st.sidebar.checkbox("Duodenum"):
+    selected_environments.append({'name': 'Duodenum', 'pH': st.sidebar.slider("Duodenum pH", 3.0, 7.0, 5.0)})
+if st.sidebar.checkbox("Jejunum"):
+    selected_environments.append({'name': 'Jejunum', 'pH': st.sidebar.slider("Jejunum pH", 5.5, 7.5, 6.5)})
+if st.sidebar.checkbox("Ileum"):
+    selected_environments.append({'name': 'Ileum', 'pH': st.sidebar.slider("Ileum pH", 6.5, 8.0, 7.5)})
 
-# Main Section Layout
-st.title("Acid-Base Action Simulation")
-st.markdown("Simulate and visualize drug solubility across various pH levels in the GI tract.")
+# Ensure we have at least one environment selected
+if not selected_environments:
+    st.warning("Please select at least one environment to simulate.")
+else:
+    # Calculate and Display Simulated Solubility Profile
+    time_steps, solubility_profile = dissolution_profile(pKa, concentration, selected_environments, dissolution_rate)
 
-# Create two columns for the Solubility Profiles
-col1, col2 = st.columns(2)
-
-# Simulated Solubility Profile Plot
-with col1:
+    # Simulated Solubility Profile
     st.subheader("Simulated Solubility Profile")
     fig1, ax1 = plt.subplots()
-    # Replace the following with actual simulation plotting code
-    time_steps = np.linspace(0, 120, 100)
-    ax1.plot(time_steps, np.sin(time_steps / 10) * concentration, label="Simulated")
+    for env in selected_environments:
+        env_name = env['name']
+        ax1.plot(time_steps, solubility_profile[env_name], label=f"{env_name} (Simulated, pH {env['pH']})")
     ax1.set_xlabel("Time (minutes)")
     ax1.set_ylabel("Dissolved Amount (mg)")
+    ax1.legend(title="Simulated GI Regions and Solubility")
     st.pyplot(fig1)
 
-# AI-Predicted Solubility Profile Plot
-with col2:
+    # AI-Predicted Solubility Profile
     st.subheader("AI-Predicted Solubility Profile")
     fig2, ax2 = plt.subplots()
-    # Replace with actual AI prediction plotting code
-    ax2.plot(time_steps, np.cos(time_steps / 10) * concentration, label="Predicted", linestyle="--")
+    for env in selected_environments:
+        env_name = env['name']
+        predicted_solubility = []
+
+        # Generate predictions over time
+        for t in time_steps:
+            features = np.array([[pKa, env['pH'], dissolution_rate, t]])
+            predicted_value = model.predict(features)[0]
+            predicted_solubility.append(predicted_value)
+
+        ax2.plot(time_steps, predicted_solubility, label=f"{env_name} (Predicted, pH {env['pH']})")
     ax2.set_xlabel("Time (minutes)")
     ax2.set_ylabel("Dissolved Amount (mg)")
+    ax2.legend(title="Predicted GI Regions and Solubility")
     st.pyplot(fig2)
-
-# Additional Features Panel
-st.subheader("Additional Data Visualizations")
-st.markdown("Use the following visualizations for deeper insights into ionization and optimal pH conditions.")
-
-# Ionization vs pH Plot
-fig3, ax3 = plt.subplots()
-pH_range = np.linspace(1, 14, 100)
-ionization = (pH_range - pKa) / (1 + abs(pH_range - pKa))
-ax3.plot(pH_range, ionization, color="orange", label="Degree of Ionization")
-ax3.set_xlabel("pH")
-ax3.set_ylabel("Ionization Level (%)")
-st.pyplot(fig3)
-
