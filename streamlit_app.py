@@ -9,6 +9,13 @@ from sklearn.linear_model import LinearRegression
 import joblib
 from solubility_simulation import calculate_degree_of_ionization, dissolution_profile, find_optimal_solubility
 
+# Load or train model
+model_path = 'solubility_predictor_model.pkl'
+if os.path.exists(model_path):
+    model = joblib.load(model_path)
+else:
+    st.error("Model file not found. Please ensure solubility_predictor_model.pkl is in the app directory.")
+
 # Sidebar for Inputs
 st.sidebar.title("Acid-Base Simulation Controls")
 st.sidebar.subheader("Drug Properties")
@@ -31,6 +38,8 @@ if st.sidebar.checkbox("Ileum"):
 # Ensure we have at least one environment selected
 if not selected_environments:
     st.warning("Please select at least one environment to simulate.")
+elif 'model' not in locals():
+    st.warning("AI model is not available. Ensure the model file is loaded.")
 else:
     # Calculate and Display Simulated Solubility Profile
     time_steps, solubility_profile = dissolution_profile(pKa, concentration, selected_environments, dissolution_rate)
