@@ -55,25 +55,33 @@ optimal_env, max_solubility = find_optimal_solubility(solubility_profile)
 st.write(f"Optimal Environment: {optimal_env}")
 st.write(f"Max Solubility: {max_solubility:.2f} mg")
 
-# AI-Predicted Solubility
-st.subheader("AI-Predicted Solubility")
-predicted_solubility = []
+# AI-Predicted Solubility Over Time
+st.subheader("AI-Predicted Solubility Over Time")
+predicted_solubility_profile = {}
+
 for env in environment_data:
     pH = env['pH']
-    features = np.array([[pKa, pH, dissolution_rate]])
-    predicted_value = model.predict(features)[0]
-    predicted_solubility.append(predicted_value)
+    env_name = env['name']
+    predicted_solubility = []
 
-# Plotting - Simulated vs. Predicted
+    # Predict solubility at each time step
+    for t in time_steps:
+        features = np.array([[pKa, pH, dissolution_rate * t]])
+        predicted_value = model.predict(features)[0]
+        predicted_solubility.append(predicted_value)
+
+    # Store the predictions for each environment
+    predicted_solubility_profile[env_name] = predicted_solubility
+
+# Plotting - Simulated vs. Predicted Over Time
 fig, ax = plt.subplots()
 for i, (env, solubility) in enumerate(solubility_profile.items()):
     env_pH = environment_data[i]['pH']
-    ax.plot(time_steps, solubility, label=f"{env} (Simulated, pH {env_pH})")
+    ax.plot(time_steps, solubility, label=f"{env} (Simulated, pH {env_pH})", linestyle='-')
 
-# Plot predicted solubility as a horizontal line
-for i, env in enumerate(environment_data):
-    ax.hlines(predicted_solubility[i], xmin=time_steps[0], xmax=time_steps[-1],
-              linestyles='dashed', label=f"{env['name']} (Predicted)")
+# Plot predicted solubility as a time-varying line
+for env, predicted_solubility in predicted_solubility_profile.items():
+    ax.plot(time_steps, predicted_solubility, label=f"{env} (Predicted)", linestyle='--')
 
 ax.set_xlabel("Time (minutes)")
 ax.set_ylabel("Dissolved Amount (mg)")
