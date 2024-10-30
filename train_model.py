@@ -3,6 +3,7 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
 import joblib
+import os  # Add this line to import the os module
 
 def load_trained_model():
     model_path = 'solubility_predictor_model.pkl'
