@@ -8,6 +8,6 @@ def calculate_solubility(pKa, concentration, selected_environments, dissolution_
     for env in selected_environments:
         pH = env['pH']
         env_name = env['name']
-        # Mock calculation for demonstration
+        # Deterministic calculation (example formula)
         solubility_profile[env_name] = dissolution_rate * time_steps * (pH / pKa) * concentration
     return time_steps, solubility_profile
