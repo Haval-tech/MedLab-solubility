@@ -8,7 +8,7 @@ def get_drug_data(drug_name):
     # Search PubChem by drug name
     search_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{drug_name}/property/IUPACName,pKa/JSON"
     response = requests.get(search_url)
-    if response.status_code == 200:  # Added the missing colon here
+    if response.status_code == 200:
         data = response.json()
         # Extract pKa if available
         if 'PropertyTable' in data:
@@ -18,6 +18,9 @@ def get_drug_data(drug_name):
 
 # Streamlit app UI
 st.title("MedLab Drug Solubility Simulation Tool")
+
+# Initialize pKa to None
+pKa = None
 
 # Choose input mode
 input_mode = st.radio("Choose input mode:", ["API Search", "Manual Input"])
@@ -46,8 +49,8 @@ environments = {
 }
 selected_env = [env for env in environments.keys() if st.sidebar.checkbox(env)]
 
-# Placeholder for solubility calculation and plotting
-if pKa and selected_env:
+# Check if pKa has a valid value and if environments are selected before proceeding
+if pKa is not None and selected_env:
     # Set up pH ranges based on selected environments
     pH_ranges = []
     for env in selected_env:
