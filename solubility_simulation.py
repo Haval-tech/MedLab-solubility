@@ -1,13 +1,25 @@
 # solubility_simulation.py
-
 import numpy as np
+import requests
 
-def calculate_solubility(pKa, concentration, selected_environments, dissolution_rate):
-    time_steps = np.linspace(0, 120, 100)
-    solubility_profile = {}
-    for env in selected_environments:
-        pH = env['pH']
-        env_name = env['name']
-        # Deterministic calculation (example formula)
-        solubility_profile[env_name] = dissolution_rate * time_steps * (pH / pKa) * concentration
-    return time_steps, solubility_profile
+def get_drug_data(drug_name):
+    search_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{drug_name}/property/IUPACName,pKa/JSON"
+    response = requests.get(search_url)
+    if response.status_code == 200:
+        data = response.json()
+        if 'PropertyTable' in data:
+            properties = data['PropertyTable']['Properties'][0]
+            return properties.get('pKa', None)
+    return None
+
+def calculate_ionization(pKa, pH):
+    ratio = 10 ** (pH - pKa)
+    ionized = ratio / (1 + ratio) * 100
+    return ionized
+
+def get_pH_ranges(selected_env, environments):
+    pH_ranges = []
+    for env in selected_env:
+        pH_min, pH_max = environments[env]
+        pH_ranges.extend(np.linspace(pH_min, pH_max, 50))
+    return pH_ranges
