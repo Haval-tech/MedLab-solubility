@@ -67,3 +67,13 @@ if pKa is not None and selected_env:
     pH_ranges = get_pH_ranges(selected_env, environments)
     ionized_percentages = [calculate_ionization(pKa, pH) for pH in pH_ranges]
     plot_solubility(ionized_percentages)
+
+# Code in streamlit_app.py (end of the pKa and selected_env block)
+st.subheader("Simulation Report")
+
+for i, env in enumerate(selected_env):
+    st.write(f"**Environment:** {env}")
+    st.write(f"- **Solubility Percentage:** {ionized_percentages[i][-1]:.2f}% at the end of the simulation.")
+    st.write(f"- **Time Range:** {0} to {len(ionized_percentages[i])}")
+    st.write("---")
+
