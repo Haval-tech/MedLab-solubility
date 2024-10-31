@@ -5,13 +5,12 @@ import numpy as np
 
 def plot_solubility(ionized_percentages=None, labels=None):
     # If no data provided, set up empty data
-    if ionized_percentages is None:
-        ionized_percentages = []
-    if labels is None:
+    if ionized_percentages is None or not ionized_percentages[0]:
+        ionized_percentages = [[]]  # Empty data
         labels = ["No Data"]
 
-    # Generate time range for x-axis (assuming it's the same length as ionized_percentages)
-    time_range = np.linspace(0, len(ionized_percentages[0]) if ionized_percentages else 1, len(ionized_percentages[0]) if ionized_percentages else 1)
+    # Generate time range for x-axis
+    time_range = np.linspace(0, len(ionized_percentages[0]), len(ionized_percentages[0]))
 
     # Plot the graph with a smaller figure size
     fig, ax = plt.subplots(figsize=(8, 4))  # Adjust size to zoom out a bit
