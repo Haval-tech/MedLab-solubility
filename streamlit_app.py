@@ -43,7 +43,7 @@ if pKa and concentration_mg and selected_env:
 
     # Create plot data
     fig, ax = plt.subplots(figsize=(10, 6))
-    time_range = np.linspace(0, 10, 100)  # Simulate time from 0 to 10 hours
+    time_range = np.linspace(0, 120, 100)  # Simulate time from 0 to 120 minutes
 
     report_data = []
 
@@ -52,24 +52,27 @@ if pKa and concentration_mg and selected_env:
         pH_range = np.linspace(pH_min, pH_max, 50)  # Range of pH values for each environment
         ionized_percentages = [calculate_ionization(pKa, pH) for pH in pH_range]
         
-        # Simulate solubility over time as an average across the pH range
-        solubility_over_time = [np.mean(ionized_percentages) * concentration_molar] * len(time_range)
-        
+        # Create a gradual increase in solubility over time for a curvy effect
+        solubility_over_time = np.array([np.mean(ionized_percentages) * concentration_molar * (1 - np.exp(-t/40)) for t in time_range])
+
         # Plot the solubility curve
         ax.plot(time_range, solubility_over_time, label=f"{env} (pH {pH_min}-{pH_max})")
-        
+
         # Store data for the report
-        avg_solubility = np.mean(ionized_percentages) * concentration_molar
-        report_data.append((env, pH_min, pH_max, avg_solubility))
+        avg_solubility = solubility_over_time[-1]  # Solubility at the end of 120 minutes
+        time_to_50_solubility = time_range[np.argmax(solubility_over_time >= 0.5 * avg_solubility)]
+        report_data.append((env, pH_min, pH_max, avg_solubility, time_to_50_solubility))
 
     # Finalize plot
-    ax.set_xlabel("Time (hours)")
+    ax.set_xlabel("Time (minutes)")
     ax.set_ylabel("Solubility (%)")
+    ax.set_ylim(0, max(solubility_over_time) * 1.2)  # Zoom out by setting y-limit
     ax.set_title("Solubility Over Time in Selected Environments")
     ax.legend()
     st.pyplot(fig)
 
     # Display report below the graph
     st.write("### Report")
-    for env, pH_min, pH_max, avg_solubility in report_data:
-        st.write(f"**{env}** (pH {pH_min}-{pH_max}): Average Solubility = {avg_solubility:.2f}% of concentration ({concentration_molar:.2f} M)")
+    for env, pH_min, pH_max, avg_solubility, time_to_50_solubility in report_data:
+        st.write(f"**{env}** (pH {pH_min}-{pH_max}): Final Solubility = {avg_solubility:.2f}% of concentration ({concentration_molar:.2f} M) at 120 minutes")
+        st.write(f"Time to reach 50% of final solubility: {time_to_50_solubility:.1f} minutes")
