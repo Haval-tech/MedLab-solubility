@@ -1,6 +1,6 @@
 # streamlit_app.py
 import streamlit as st
-from solubility_simulation import get_drug_data, calculate_ionization, get_pH_ranges
+from solubility_simulation import get_drug_data, calculate_ionization, get_pH_ranges, get_autocomplete_suggestions
 from plot_settings import plot_solubility
 from layout_settings import setup_layout
 
@@ -13,17 +13,27 @@ st.title("MedLab Drug Solubility Simulation Tool")
 # Choose input mode
 input_mode = st.radio("Choose input mode:", ["API Search", "Manual Input"])
 
-# Get pKa based on input mode
+# Autocomplete and API Search
 pKa = None
 if input_mode == "API Search":
-    drug_name = st.text_input("Enter drug name to search for pKa:")
-    if drug_name:
-        pKa = get_drug_data(drug_name)
-        if pKa:
-            st.write(f"Found pKa for {drug_name}: {pKa}")
-        else:
-            st.write("pKa information not available. Use manual input for custom values.")
+    # Search bar with autocomplete functionality
+    query = st.text_input("Enter drug or substance name:")
+    if query:
+        # Fetch suggestions from PubChem
+        suggestions = get_autocomplete_suggestions(query)
+        if suggestions:
+            st.write("Did you mean:")
+            for suggestion in suggestions:
+                if st.button(suggestion):  # Display each suggestion as a button
+                    selected_name = suggestion
+                    pKa = get_drug_data(selected_name)
+                    if pKa:
+                        st.write(f"Found pKa for {selected_name}: {pKa}")
+                    else:
+                        st.write("pKa information not available for this drug.")
+                    break  # Exit loop after selection
 else:
+    # Manual input mode
     pKa = st.number_input("Enter known pKa value:", min_value=0.0, max_value=14.0, step=0.1)
 
 # Environment selection
