@@ -42,7 +42,7 @@ if pKa and concentration_mg and selected_env:
         return ionized
 
     # Create plot data
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(12, 6))
     time_range = np.linspace(0, 120, 100)  # Simulate time from 0 to 120 minutes
 
     report_data = []
@@ -56,7 +56,7 @@ if pKa and concentration_mg and selected_env:
         solubility_over_time = np.array([np.mean(ionized_percentages) * concentration_molar * (1 - np.exp(-t/40)) for t in time_range])
 
         # Plot the solubility curve
-        ax.plot(time_range, solubility_over_time, label=f"{env} (pH {pH_min}-{pH_max})")
+        ax.plot(time_range, solubility_over_time, label=f"{env} (pH {pH_min}-{pH_max})", linewidth=2)
 
         # Store data for the report
         avg_solubility = solubility_over_time[-1]  # Solubility at the end of 120 minutes
@@ -66,9 +66,10 @@ if pKa and concentration_mg and selected_env:
     # Finalize plot
     ax.set_xlabel("Time (minutes)")
     ax.set_ylabel("Solubility (%)")
-    ax.set_ylim(0, max(solubility_over_time) * 1.2)  # Zoom out by setting y-limit
+    ax.set_ylim(0, max(solubility_over_time) * 2)  # Zoom out by setting a broad y-limit
     ax.set_title("Solubility Over Time in Selected Environments")
     ax.legend()
+    ax.grid(True, linestyle='--', alpha=0.7)
     st.pyplot(fig)
 
     # Display report below the graph
