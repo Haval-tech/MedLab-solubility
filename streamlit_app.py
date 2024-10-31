@@ -1,7 +1,3 @@
-# streamlit_app.py
-# Initial empty plot to display an empty graph before input
-plot_solubility()
-
 from plot_settings import plot_solubility
 
 import streamlit as st
