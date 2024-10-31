@@ -1,14 +1,13 @@
 # plot_settings.py
-
 import matplotlib.pyplot as plt
 import streamlit as st
+import numpy as np
 
-def plot_simulated_profile(time_steps, solubility_profile, selected_environments):
+def plot_solubility(ionized_percentages):
+    time_range = np.linspace(0, len(ionized_percentages), len(ionized_percentages))
     fig, ax = plt.subplots()
-    for env in selected_environments:
-        env_name = env['name']
-        ax.plot(time_steps, solubility_profile[env_name], label=f"{env_name} (Simulated, pH {env['pH']})")
-    ax.set_xlabel("Time (minutes)")
-    ax.set_ylabel("Dissolved Amount (mg)")
-    ax.legend(title="Simulated GI Regions and Solubility")
+    ax.plot(time_range, ionized_percentages, label='Solubility (%)', color='blue')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Solubility Percentage')
+    ax.set_title("Solubility Percentage over Time")
     st.pyplot(fig)
