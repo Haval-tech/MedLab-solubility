@@ -1,4 +1,7 @@
 # streamlit_app.py
+# Initial empty plot to display an empty graph before input
+plot_solubility()
+# streamlit_app.py
 import streamlit as st
 from solubility_simulation import get_drug_data, calculate_ionization, get_pH_ranges, get_autocomplete_suggestions
 from plot_settings import plot_solubility
