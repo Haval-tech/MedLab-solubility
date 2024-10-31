@@ -1,45 +1,32 @@
+# streamlit_app.py
 import streamlit as st
-import requests
-import numpy as np
-import matplotlib.pyplot as plt
+from solubility_simulation import get_drug_data, calculate_ionization, get_pH_ranges
+from plot_settings import plot_solubility
+from layout_settings import setup_layout
 
-# Function to fetch drug data from PubChem API
-def get_drug_data(drug_name):
-    # Search PubChem by drug name
-    search_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{drug_name}/property/IUPACName,pKa/JSON"
-    response = requests.get(search_url)
-    if response.status_code == 200:
-        data = response.json()
-        # Extract pKa if available
-        if 'PropertyTable' in data:
-            properties = data['PropertyTable']['Properties'][0]
-            return properties.get('pKa', None)  # Returns the pKa value if available
-    return None
+# Set up the layout
+setup_layout()
 
-# Streamlit app UI
+# Title
 st.title("MedLab Drug Solubility Simulation Tool")
-
-# Initialize pKa to None
-pKa = None
 
 # Choose input mode
 input_mode = st.radio("Choose input mode:", ["API Search", "Manual Input"])
 
-# Option 1: API Search
+# Get pKa based on input mode
+pKa = None
 if input_mode == "API Search":
     drug_name = st.text_input("Enter drug name to search for pKa:")
-
     if drug_name:
         pKa = get_drug_data(drug_name)
         if pKa:
             st.write(f"Found pKa for {drug_name}: {pKa}")
         else:
-            st.write("pKa information not available for this drug. Switch to manual input for custom values.")
+            st.write("pKa information not available. Use manual input for custom values.")
 else:
-    # Option 2: Manual Input
     pKa = st.number_input("Enter known pKa value:", min_value=0.0, max_value=14.0, step=0.1)
 
-# Environment Selection with checkboxes
+# Environment selection
 st.sidebar.header("Choose Environment")
 environments = {
     "Stomach": (1, 3),
@@ -49,27 +36,8 @@ environments = {
 }
 selected_env = [env for env in environments.keys() if st.sidebar.checkbox(env)]
 
-# Check if pKa has a valid value and if environments are selected before proceeding
+# Calculate and plot if pKa and environments are provided
 if pKa is not None and selected_env:
-    # Set up pH ranges based on selected environments
-    pH_ranges = []
-    for env in selected_env:
-        pH_min, pH_max = environments[env]
-        pH_ranges.extend(np.linspace(pH_min, pH_max, 50))
-
-    # Calculate solubility for each pH
-    def calculate_ionization(pKa, pH):
-        ratio = 10 ** (pH - pKa)
-        ionized = ratio / (1 + ratio) * 100
-        return ionized
-
+    pH_ranges = get_pH_ranges(selected_env, environments)
     ionized_percentages = [calculate_ionization(pKa, pH) for pH in pH_ranges]
-    time_range = np.linspace(0, len(ionized_percentages), len(ionized_percentages))
-
-    # Plot the graph
-    fig, ax = plt.subplots()
-    ax.plot(time_range, ionized_percentages, label='Solubility (%)', color='blue')
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Solubility Percentage')
-    ax.set_title("Solubility Percentage over Time")
-    st.pyplot(fig)
+    plot_solubility(ionized_percentages)
