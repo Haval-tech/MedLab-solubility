@@ -8,13 +8,8 @@ def get_drug_data(drug_name):
     # Search PubChem by drug name
     search_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{drug_name}/property/IUPACName,pKa/JSON"
     response = requests.get(search_url)
-    if response.status_code == 200:
-        data = response.json()
-        # Extract pKa if available
-        if 'PropertyTable' in data:
-            properties = data['PropertyTable']['Properties'][0]
-            return properties.get('pKa', None)  # Returns the pKa value if available
-    return None
+    if response.status_code
+
 
 # Streamlit app UI
 st.title("Drug Solubility Simulation Tool")
