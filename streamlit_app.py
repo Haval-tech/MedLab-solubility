@@ -1,77 +1,75 @@
-from plot_settings import plot_solubility
-
+# streamlit_app.py
 import streamlit as st
-from solubility_simulation import get_drug_data, calculate_ionization, get_pH_ranges, get_autocomplete_suggestions
-from plot_settings import plot_solubility
+import numpy as np
+import matplotlib.pyplot as plt
 from layout_settings import setup_layout
 
-# Set up the layout
+# Set up layout
 setup_layout()
 
 # Title
-st.title("MedLab Drug Solubility Simulation Tool")
+st.title("Drug Solubility Simulation Tool")
 
-# Choose input mode
-input_mode = st.radio("Choose input mode:", ["API Search", "Manual Input"])
+# Instructions
+st.write("### Input Parameters")
+st.write("This tool simulates drug solubility over time in different gastrointestinal environments.")
 
-# Initialize session state for query and suggestions
-if "query" not in st.session_state:
-    st.session_state.query = ""
-if "suggestions" not in st.session_state:
-    st.session_state.suggestions = []
-
-# Autocomplete and API Search
-pKa = None
-selected_name = None
-
-if input_mode == "API Search":
-    # Search bar with autocomplete functionality
-    query = st.text_input("Enter drug or substance name:", key="query")
-    
-    # Update suggestions only when the query changes
-    if query and query != st.session_state.query:
-        st.session_state.query = query
-        st.session_state.suggestions = get_autocomplete_suggestions(query)
-
-    # Display suggestions as clickable buttons
-    if st.session_state.suggestions:
-        st.write("Did you mean:")
-        for suggestion in st.session_state.suggestions:
-            if st.button(suggestion):  # Display each suggestion as a button
-                selected_name = suggestion
-                pKa = get_drug_data(selected_name)
-                if pKa:
-                    st.write(f"Found pKa for {selected_name}: {pKa}")
-                else:
-                    st.write("pKa information not available for this drug.")
-                st.session_state.suggestions = []  # Clear suggestions after selection
-                break  # Exit loop after selection
-else:
-    # Manual input mode
-    pKa = st.number_input("Enter known pKa value:", min_value=0.0, max_value=14.0, step=0.1)
+# Input fields
+pKa = st.number_input("Enter the pKa of the drug:", min_value=0.0, max_value=14.0, step=0.1)
+concentration_mg = st.number_input("Enter drug concentration (mg):", min_value=0.0, step=0.1)
 
 # Environment selection
-st.sidebar.header("Choose Environment")
+st.write("### Select the Environment(s)")
 environments = {
     "Stomach": (1, 3),
     "Duodenum": (5, 6),
     "Jejunum": (6, 7),
     "Ileum": (7, 8)
 }
-selected_env = [env for env in environments.keys() if st.sidebar.checkbox(env)]
+selected_env = [env for env in environments.keys() if st.checkbox(env)]
 
-# Calculate and plot if pKa and environments are provided
-if pKa is not None and selected_env:
-    pH_ranges = get_pH_ranges(selected_env, environments)
-    ionized_percentages = [calculate_ionization(pKa, pH) for pH in pH_ranges]
-    plot_solubility(ionized_percentages)
+# Calculation and Output
+if pKa and concentration_mg and selected_env:
+    st.write("### Simulation Results")
 
-# Code in streamlit_app.py (end of the pKa and selected_env block)
-st.subheader("Simulation Report")
+    # Convert concentration from mg to molarity (assuming 1 L for simplicity)
+    concentration_molar = concentration_mg / 1000  # Simple conversion for demonstration
 
-for i, env in enumerate(selected_env):
-    st.write(f"**Environment:** {env}")
-    st.write(f"- **Solubility Percentage:** {ionized_percentages[i][-1]:.2f}% at the end of the simulation.")
-    st.write(f"- **Time Range:** {0} to {len(ionized_percentages[i])}")
-    st.write("---")
+    # Function to calculate ionization percentage
+    def calculate_ionization(pKa, pH):
+        ratio = 10 ** (pH - pKa)
+        ionized = ratio / (1 + ratio) * 100
+        return ionized
 
+    # Create plot data
+    fig, ax = plt.subplots(figsize=(10, 6))
+    time_range = np.linspace(0, 10, 100)  # Simulate time from 0 to 10 hours
+
+    report_data = []
+
+    for env in selected_env:
+        pH_min, pH_max = environments[env]
+        pH_range = np.linspace(pH_min, pH_max, 50)  # Range of pH values for each environment
+        ionized_percentages = [calculate_ionization(pKa, pH) for pH in pH_range]
+        
+        # Simulate solubility over time as an average across the pH range
+        solubility_over_time = [np.mean(ionized_percentages) * concentration_molar] * len(time_range)
+        
+        # Plot the solubility curve
+        ax.plot(time_range, solubility_over_time, label=f"{env} (pH {pH_min}-{pH_max})")
+        
+        # Store data for the report
+        avg_solubility = np.mean(ionized_percentages) * concentration_molar
+        report_data.append((env, pH_min, pH_max, avg_solubility))
+
+    # Finalize plot
+    ax.set_xlabel("Time (hours)")
+    ax.set_ylabel("Solubility (%)")
+    ax.set_title("Solubility Over Time in Selected Environments")
+    ax.legend()
+    st.pyplot(fig)
+
+    # Display report below the graph
+    st.write("### Report")
+    for env, pH_min, pH_max, avg_solubility in report_data:
+        st.write(f"**{env}** (pH {pH_min}-{pH_max}): Average Solubility = {avg_solubility:.2f}% of concentration ({concentration_molar:.2f} M)")
