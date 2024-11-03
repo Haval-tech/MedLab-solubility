@@ -16,7 +16,7 @@ def run_simulation(pKa, concentration_mg, selected_env):
     }
 
     time_range = np.linspace(0, 120, 100)
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(6, 3))
     report_data = []
 
     for env in selected_env:
