@@ -3,19 +3,29 @@ from layout_settings import setup_layout
 from inputs import get_user_inputs
 from simulation import run_simulation
 from report import generate_report
-from home import home_page  # Import the home page function
+from home import home_page
 
 def main():
     setup_layout()
     
-    # Sidebar for navigation
-    st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to", ["Home", "Drug Solubility Simulation"])
+    # Initialize session state if it doesn't exist
+    if 'page' not in st.session_state:
+        st.session_state.page = 'Home'
     
-    if page == "Home":
-        home_page()  # Show the home page
-    elif page == "Drug Solubility Simulation":
-        solubility_simulation_page()  # Show the solubility simulation page
+    # Button navigation
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button('Home'):
+            st.session_state.page = 'Home'
+    with col2:
+        if st.button('Drug Solubility Simulation'):
+            st.session_state.page = 'Drug Solubility Simulation'
+    
+    # Render the selected page
+    if st.session_state.page == 'Home':
+        home_page()
+    elif st.session_state.page == 'Drug Solubility Simulation':
+        solubility_simulation_page()
 
 def solubility_simulation_page():
     st.title("Drug Solubility Simulation Tool")
