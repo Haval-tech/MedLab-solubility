@@ -2,7 +2,6 @@ import streamlit as st
 from layout_settings import setup_layout
 from inputs import get_user_inputs
 from simulation import run_simulation
-from plotting import plot_results
 from report import generate_report
 
 def main():
@@ -16,7 +15,7 @@ def main():
     if pKa and concentration_mg and selected_env:
         st.write("### Simulation Results")
         report_data, fig = run_simulation(pKa, concentration_mg, selected_env)
-        st.pyplot(fig)
+        st.pyplot(fig)  # Display the plot
         generate_report(report_data, concentration_mg)
 
 if __name__ == "__main__":
