@@ -12,12 +12,10 @@ def main():
     if 'page' not in st.session_state:
         st.session_state.page = 'Home'
     
-    # Button navigation
-    col1, col2 = st.columns(2)
-    with col1:
+    # Vertical button navigation on the top left
+    with st.sidebar:
         if st.button('Home'):
             st.session_state.page = 'Home'
-    with col2:
         if st.button('Drug Solubility Simulation'):
             st.session_state.page = 'Drug Solubility Simulation'
     
