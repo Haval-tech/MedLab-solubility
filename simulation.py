@@ -16,7 +16,7 @@ def run_simulation(pKa, concentration_mg, selected_env):
     }
 
     time_range = np.linspace(0, 120, 100)
-    fig, ax = plt.subplots(figsize=(6, 3))
+    fig, ax = plt.subplots(figsize=(12, 6))
     report_data = []
 
     for env in selected_env:
@@ -28,15 +28,29 @@ def run_simulation(pKa, concentration_mg, selected_env):
             np.mean(ionized_percentages) * concentration_molar * (1 - np.exp(-t/40)) for t in time_range
         ])
 
-        ax.plot(time_range, solubility_over_time, label=f"{env} (pH {pH_min}-{pH_max})", linewidth=2)
+        # Plot the solubility curve
+        line, = ax.plot(time_range, solubility_over_time, label=f"{env} (pH {pH_min}-{pH_max})", linewidth=2)
+        
+        # Calculate milestones
         avg_solubility = solubility_over_time[-1]
         time_to_50_solubility = time_range[np.argmax(solubility_over_time >= 0.5 * avg_solubility)]
+
+        # Add annotation for 50% solubility
+        ax.annotate(
+            f"50% solubility\nat {time_to_50_solubility:.1f} min",
+            xy=(time_to_50_solubility, 0.5 * avg_solubility),
+            xytext=(time_to_50_solubility + 5, 0.5 * avg_solubility + 5),
+            arrowprops=dict(facecolor='black', arrowstyle='->'),
+            fontsize=10
+        )
+
+        # Add milestone data
         report_data.append((env, pH_min, pH_max, avg_solubility, time_to_50_solubility))
 
     ax.set_xlabel("Time (minutes)")
     ax.set_ylabel("Solubility (%)")
-    ax.set_ylim(0, max(solubility_over_time) * 2)
-    ax.set_title("Solubility Over Time in Selected Environments")
+    ax.set_ylim(0, 100)  # Assuming solubility percentage maxes at 100%
+    ax.set_title("Dynamic Solubility Graph")
     ax.legend()
     ax.grid(True, linestyle='--', alpha=0.7)
     
