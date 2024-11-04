@@ -1,7 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def calculate_ionization(pKa, pH):
+    """Calculate the ionization percentage based on pKa and pH."""
+    ratio = 10 ** (pH - pKa)
+    ionized = ratio / (1 + ratio) * 100
+    return ionized
+
 def run_simulation(pKa, concentration_mg, selected_env):
+    """Run the drug solubility simulation for selected environments."""
     concentration_molar = concentration_mg / 1000
     environments = {
         "Stomach": (1, 3),
