@@ -8,14 +8,8 @@ from home import home_page
 def main():
     setup_layout()
     
-    # Sidebar logo and navigation
+    # Sidebar navigation without the logo
     with st.sidebar:
-        # Display the logo
-        st.image("path/to/logo.png", use_column_width=True)
-        
-        st.write("")  # Add a bit of space
-        st.write("")  # Add more space if needed
-        
         st.title("Navigation")
         if st.button('Home'):
             st.session_state.page = 'Home'
@@ -36,19 +30,13 @@ def solubility_simulation_page():
     
     # Capture user inputs
     pKa, concentration_mg, selected_env = get_user_inputs()
-    
-    # Debugging: Write out captured values to check if they're being set
-    st.write(f"Captured pKa: {pKa}")
-    st.write(f"Captured concentration (mg): {concentration_mg}")
-    st.write(f"Selected environments: {selected_env}")
 
-    # Proceed only if all necessary inputs are provided
+    # Check inputs and proceed if valid
     if pKa and concentration_mg and selected_env:
         st.write("### Simulation Results")
         report_data, fig = run_simulation(pKa, concentration_mg, selected_env)
         st.pyplot(fig)
         generate_report(report_data, concentration_mg)
-    else:
-        st.write("Please enter all required inputs to run the simulation.")
 
-
+if __name__ == "__main__":
+    main()
