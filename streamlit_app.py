@@ -34,13 +34,13 @@ def solubility_simulation_page():
     st.write("### Input Parameters")
     st.write("This tool simulates drug solubility over time in different gastrointestinal environments.")
     
+    # Ensure pKa is captured correctly
     pKa, concentration_mg, selected_env = get_user_inputs()
 
+    # Only proceed if pKa has a valid input
     if pKa and concentration_mg and selected_env:
         st.write("### Simulation Results")
         report_data, fig = run_simulation(pKa, concentration_mg, selected_env)
         st.pyplot(fig)
         generate_report(report_data, concentration_mg)
 
-if __name__ == "__main__":
-    main()
