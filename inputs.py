@@ -1,3 +1,5 @@
+import streamlit as st  # Ensure this import is present
+
 def get_user_inputs():
     """Collect user inputs for the simulation."""
     pKa = st.number_input("Enter the pKa of the drug:", min_value=0.0, max_value=14.0, step=0.1)
