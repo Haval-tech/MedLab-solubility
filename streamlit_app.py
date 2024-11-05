@@ -36,14 +36,19 @@ def solubility_simulation_page():
     
     # Capture user inputs
     pKa, concentration_mg, selected_env = get_user_inputs()
+    
+    # Debugging: Write out captured values to check if they're being set
+    st.write(f"Captured pKa: {pKa}")
+    st.write(f"Captured concentration (mg): {concentration_mg}")
+    st.write(f"Selected environments: {selected_env}")
 
-    # Proceed if pKa is not None and greater than zero, and other inputs are valid
-    if pKa is not None and pKa >= 0.0 and concentration_mg > 0 and selected_env:
+    # Proceed only if all necessary inputs are provided
+    if pKa and concentration_mg and selected_env:
         st.write("### Simulation Results")
         report_data, fig = run_simulation(pKa, concentration_mg, selected_env)
         st.pyplot(fig)
         generate_report(report_data, concentration_mg)
     else:
-        st.write("Please enter valid inputs for pKa, concentration, and select at least one environment.")
+        st.write("Please enter all required inputs to run the simulation.")
 
 
