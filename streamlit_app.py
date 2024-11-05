@@ -8,14 +8,18 @@ from home import home_page
 def main():
     setup_layout()
     
-    # Initialize session state if it doesn't exist
-    if 'page' not in st.session_state:
-        st.session_state.page = 'Home'
-    
-    # Vertical button navigation on the top left
+    # Sidebar logo and navigation
     with st.sidebar:
+        # Display the logo
+        st.image("path/to/logo.png", use_column_width=True)
+        
+        st.write("")  # Add a bit of space
+        st.write("")  # Add more space if needed
+        
+        st.title("Navigation")
         if st.button('Home'):
             st.session_state.page = 'Home'
+        st.write("")  # Add space between buttons
         if st.button('Drug Solubility Simulation'):
             st.session_state.page = 'Drug Solubility Simulation'
     
