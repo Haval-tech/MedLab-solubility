@@ -8,9 +8,12 @@ from home import home_page
 def main():
     setup_layout()
     
+    # Initialize session state for 'page' if it does not exist
+    if 'page' not in st.session_state:
+        st.session_state['page'] = 'Home'  # Default to Home
+    
     # Sidebar logo and navigation
     with st.sidebar:
-        # Display the logo using the .webp file
         st.image("logo.png.webp", use_column_width=True)
         
         st.title("Navigation")
