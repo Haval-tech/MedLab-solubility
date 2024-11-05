@@ -45,28 +45,3 @@ def solubility_simulation_page():
 if __name__ == "__main__":
     main()
 
-import streamlit as st
-
-# Set page config to ensure sidebar is expanded by default
-st.set_page_config(layout="wide", initial_sidebar_state="expanded")
-
-# Custom CSS to hide the sidebar toggle arrow
-hide_toggle_css = """
-    <style>
-    /* Hide the sidebar collapse/expand button */
-    .css-1v0mbdj.e1fqkh3o2 { 
-        display: none; 
-    }
-    </style>
-"""
-
-# Inject the custom CSS into the app
-st.markdown(hide_toggle_css, unsafe_allow_html=True)
-
-# Your main app code here
-st.sidebar.title("Navigation")
-st.sidebar.button("Home")
-st.sidebar.button("Drug Solubility Simulation")
-st.title("Drug Solubility Simulation Tool")
-# Add the rest of your app layout and functionality here
-
