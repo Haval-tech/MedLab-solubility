@@ -19,10 +19,10 @@ def get_user_inputs():
         if st.checkbox(env):
             default_pH = (pH_min + pH_max) / 2  # Default pH is the middle of the range
             selected_pH = st.slider(
-                f"Adjust pH for {env} (Range: {pH_min}-{pH_max})", 
-                min_value=pH_min, 
-                max_value=pH_max, 
-                value=default_pH, 
+                f"Adjust pH for {env} (Range: {float(pH_min)}-{float(pH_max)})", 
+                min_value=float(pH_min), 
+                max_value=float(pH_max), 
+                value=float(default_pH), 
                 step=0.1
             )
             selected_env[env] = selected_pH
