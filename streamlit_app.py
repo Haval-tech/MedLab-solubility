@@ -8,8 +8,11 @@ from home import home_page
 def main():
     setup_layout()
     
-    # Sidebar navigation without the logo
+    # Sidebar logo and navigation
     with st.sidebar:
+        # Display the logo using the .webp file
+        st.image("logo.png.webp", use_column_width=True)
+        
         st.title("Navigation")
         if st.button('Home'):
             st.session_state.page = 'Home'
@@ -28,10 +31,8 @@ def solubility_simulation_page():
     st.write("### Input Parameters")
     st.write("This tool simulates drug solubility over time in different gastrointestinal environments.")
     
-    # Capture user inputs
     pKa, concentration_mg, selected_env = get_user_inputs()
 
-    # Check inputs and proceed if valid
     if pKa and concentration_mg and selected_env:
         st.write("### Simulation Results")
         report_data, fig = run_simulation(pKa, concentration_mg, selected_env)
