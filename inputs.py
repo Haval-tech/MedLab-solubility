@@ -16,15 +16,20 @@ def get_user_inputs():
     selected_env = {}
     
     for env, (pH_min, pH_max) in environments.items():
-        if st.checkbox(env):
-            default_pH = (pH_min + pH_max) / 2  # Default pH is the middle of the range
-            selected_pH = st.slider(
-                f"Adjust pH for {env} (Range: {float(pH_min)}-{float(pH_max)})", 
-                min_value=float(pH_min), 
-                max_value=float(pH_max), 
-                value=float(default_pH), 
-                step=0.1
-            )
-            selected_env[env] = selected_pH
+        col1, col2 = st.columns([1, 2])  # Adjust the ratio to control slider length
+        with col1:
+            is_checked = st.checkbox(env)
+        if is_checked:
+            with col2:
+                default_pH = (pH_min + pH_max) / 2  # Default pH is the middle of the range
+                selected_pH = st.slider(
+                    f"pH for {env}",
+                    min_value=float(pH_min), 
+                    max_value=float(pH_max), 
+                    value=float(default_pH), 
+                    step=0.1,
+                    key=env  # Ensure unique keys for sliders
+                )
+                selected_env[env] = selected_pH
 
     return pKa, concentration_mg, selected_env
