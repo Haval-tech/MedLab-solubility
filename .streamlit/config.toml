@@ -1,2 +1,8 @@
 [theme]
-base = "dark"
+base="dark"
+
+[browser]
+gather_usage_stats = false
+
+[sidebar]
+collapsed = false
